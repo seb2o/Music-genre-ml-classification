@@ -1,19 +1,30 @@
 import pandas as pd
 
 dataPath = '../Classification Music/'
-firstFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"]
-firstClasses = ["pop", "disco", "metal", "classical"]
+givenFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"]
+pickedFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"]
+givenClasses = ["pop", "disco", "metal", "classical"]
 filenames = [f'{dataPath}GenreClassData_{i}s.txt' for i in [5, 10, 30]]
 
 
-def load_data():
-    df5s = pd.read_csv(filenames[0], sep='\t')
-    df10s = pd.read_csv(filenames[1], sep='\t')
-    df30s = pd.read_csv(filenames[2], sep='\t')
+def load_data(filename):
+    return pd.read_csv(filename, sep='\t')
+
+
+def task1_df():
+    return load_data(filenames[2])[givenFeatures]
+
+
+def task2_df():
+    return task1_df().groupby('Genre').agg(list).loc[givenClasses]
+
+
+def task3_df():
+    return load_data(filenames[3])[pickedFeatures]
+
+
+def task4_df():
+    df5s = load_data(filenames[0])
+    df10s = load_data(filenames[1])
+    df30s = load_data(filenames[2])
     return df5s, df10s, df30s
-
-
-def task1_df(df: pd.DataFrame):
-    return df[firstFeatures].groupby('Genre').agg(list).loc[firstClasses]
-
-
