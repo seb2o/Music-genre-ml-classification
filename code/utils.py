@@ -45,3 +45,22 @@ def task4_df():
     df10s = load_data(filenames[1])
     df30s = load_data(filenames[2])
     return df5s, df10s, df30s
+
+
+def plot_feature_by_genre(feature_to_compare, use_df):
+    grouped = use_df.groupby('Genre')[feature_to_compare]
+    fig, axes = plt.subplots(3, 4, sharex=True, sharey=False, figsize=(15, 10))
+    ax_index = 0
+    for name, values in grouped:
+        axes[ax_index // 4][ax_index % 4].hist(values, density=True)
+        axes[ax_index // 4][ax_index % 4].set_title(name)
+        ax_index += 1
+
+
+def plot_corr(df, topRotation=90, figNumber=None):
+    plt.matshow(df.corr(), fignum=figNumber)
+    plt.xticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14, rotation=topRotation)
+    plt.yticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14)
+    cb = plt.colorbar()
+    cb.ax.tick_params(labelsize=14)
+    plt.title('Correlation Matrix', fontsize=16)
