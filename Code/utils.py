@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import pandas as pd
 from matplotlib import pyplot as plt
 from pandas import DataFrame
