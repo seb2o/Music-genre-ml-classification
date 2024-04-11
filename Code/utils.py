@@ -28,6 +28,8 @@ def task1_df(dropType=False) -> pd.DataFrame:
     ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"]
     :return: df with the above features, from the 30s dataset
     """
+    if not dropType:
+        givenFeatures.append('Type')
     return load_data(filenames[2], dropType=dropType)[givenFeatures]
 
 
@@ -49,6 +51,8 @@ def task3_df(dropType=False) -> pd.DataFrame:
     ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean", "tempo", "Genre"]
     :return: df from the 30s dataset, with only the 4 handpicked features above
     """
+    if not dropType:
+        pickedFeatures.append('Type')
     return load_data(filenames[3], dropType=dropType)[pickedFeatures]
 
 
