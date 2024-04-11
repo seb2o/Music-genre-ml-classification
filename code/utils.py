@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 dataPath = '../Classification Music/'
 givenFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"]
-pickedFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"]
+pickedFeatures = ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean", "tempo", "Genre"]
 givenClasses = ["pop", "disco", "metal", "classical"]
 filenames = [f'{dataPath}GenreClassData_{i}s.txt' for i in [5, 10, 30]]
 
