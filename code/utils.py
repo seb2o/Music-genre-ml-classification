@@ -8,8 +8,11 @@ givenClasses = ["pop", "disco", "metal", "classical"]
 filenames = [f'{dataPath}GenreClassData_{i}s.txt' for i in [5, 10, 30]]
 
 
-def load_data(filename):
-    return pd.read_csv(filename, sep='\t')
+def load_data(filename, dropType=True):
+    columns_to_drop = ['File']
+    if dropType:
+        columns_to_drop.append('Type')
+    return pd.read_csv(filename, sep='\t').drop(columns=columns_to_drop)
 
 
 def task1_df():
