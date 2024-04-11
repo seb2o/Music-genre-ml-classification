@@ -1,37 +1,37 @@
+from typing import Tuple
+
 import pandas as pd
 from matplotlib import pyplot as plt
+from pandas import DataFrame
 
 dataPath = '../Classification Music/'
-givenFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"]
-pickedFeatures = ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean", "tempo", "Genre"]
+metaFeatures = ["Type", "GenreID"]
+EDAfeatures = ['Genre']
+givenFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo"]
+pickedFeatures = ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean", "tempo"]
 givenClasses = ["pop", "disco", "metal", "classical"]
 filenames = [f'{dataPath}GenreClassData_{i}s.txt' for i in [5, 10, 30]]
 columns_to_drop = ['File']
 
 
-def load_data(filename: str, dropType=True) -> pd.DataFrame:
+def load_data(filename: str) -> pd.DataFrame:
     """
     Fetch dataset from their .txt file into a nice dataframe.
     Normally should not be used outside this file. Prefer :func:`utils.task4_df() <utils.task4_df>`
     :param filename: The .txt file used
-    :param dropType: if True, drop the "Type" column of the dataset
     :return: dataframe of one of the dataset
     """
-    if dropType:
-        columns_to_drop.append('Type')
     return pd.read_csv(filename, sep='\t').drop(columns=columns_to_drop)
 
 
-def task1_df(dropType=False) -> pd.DataFrame:
+def task1_df(isEDA=False) -> pd.DataFrame:
     """
-    Option to drop type column to ease EDA. \n
     ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"]
+    :param isEDA: if True, remove non meaningful features to ease EDA
     :return: df with the above features, from the 30s dataset
     """
-    insideGivenFeatures = givenFeatures.copy()
-    if not dropType:
-        insideGivenFeatures += ['Type']
-    return load_data(filenames[2], dropType=dropType)[insideGivenFeatures]
+    additionalFeatures = EDAfeatures if isEDA else metaFeatures
+    return load_data(filenames[2])[givenFeatures + additionalFeatures]
 
 
 def task2_df() -> pd.DataFrame:
@@ -42,32 +42,30 @@ def task2_df() -> pd.DataFrame:
     ["pop", "disco", "metal", "classical"]
     :return: df with the above features, only for the 4 above classes, from the 30s dataset
     """
-    return task1_df().groupby('Genre').agg(list).loc[givenClasses]
+    return task1_df(isEDA=True).groupby('Genre').agg(list).loc[givenClasses]
 
 
-def task3_df(dropType=False) -> pd.DataFrame:
+def task3_df(isEDA=False) -> pd.DataFrame:
     """
     Option to drop "Type" column to ease EDA.\n
     Features :\n
     ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean", "tempo", "Genre"]
+    :param isEDA: if True, remove non meaningful features to ease EDA
     :return: df from the 30s dataset, with only the 4 handpicked features above
     """
-    insidePickedFeatures = pickedFeatures.copy()
-    if not dropType:
-        insidePickedFeatures += ['Type']
-    return load_data(filenames[3], dropType=dropType)[insidePickedFeatures]
+    additionalFeatures = EDAfeatures if isEDA else metaFeatures
+    return load_data(filenames[2])[pickedFeatures + additionalFeatures]
 
 
-def task4_df(dropType=False) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def task4_df(isEDA=False) -> tuple[DataFrame, ...]:
     """
     Loads the whole dataset into 3 separate data frames
-    :param dropType: if True, the "Type" column is dropped
     :return: a 3-uple with, in this order, df5s, df10s, df30s.
     """
-    df5s = load_data(filenames[0], dropType=dropType)
-    df10s = load_data(filenames[1], dropType=dropType)
-    df30s = load_data(filenames[2], dropType=dropType)
-    return df5s, df10s, df30s
+    featureToDrop = ['Genre', 'Track ID']
+    if isEDA:
+        featureToDrop = ['Type']
+    return tuple(load_data(filename).drop(columns=featureToDrop) for filename in filenames)
 
 
 def plot_feature_by_genre(feature_to_compare, use_df) -> None:
