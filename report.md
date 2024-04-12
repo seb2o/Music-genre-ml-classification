@@ -16,6 +16,22 @@ correlation between the 4 selected features. Thus, amongst the 4 initial feature
 pair with the highest correlation, we remove the one with the lowest absolute correlation with GenreID. Then we select the feature 
 with the highest correlation with GenreID, provided that its correlation with the 3 remaining features is not too high
 
+
+Maybe we could test all the possibilities: 
+       
+    for each of the task 1 features :
+        drop it
+        for each of the dataset other features:
+            add it
+            fit knn
+            predict test set
+            store accuracy : currently added and removed feature
+    print the pair with the highest accuracy
+
+we can take the 4 givenFeatures, remove the removed of the above printed pair and add 
+the added pair of the above printed pair
+    
+
 ### Task 4: Free classifier.
 
 
