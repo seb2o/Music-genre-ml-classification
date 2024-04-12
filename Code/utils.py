@@ -59,7 +59,8 @@ def task3_df(isEDA=False) -> pd.DataFrame:
 
 def task4_df(isEDA=False) -> tuple[DataFrame, ...]:
     """
-    Loads the whole dataset into 3 separate data frames
+    Loads the whole dataset into 3 separate data frames. Drops by default 'Genre' and 'Track ID' columns.
+    :param isEDA: if set to True, remove the 'Type' column.
     :return: a 3-uple with, in this order, df5s, df10s, df30s.
     """
     featureToDrop = ['Genre', 'Track ID']
