@@ -10,6 +10,8 @@ pickedFeatures = ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean"
 givenClasses = ["pop", "disco", "metal", "classical"]
 filenames = [f'{dataPath}GenreClassData_{i}s.txt' for i in [5, 10, 30]]
 columns_to_drop = ['File']
+genreIDtoName = ["pop", "metal", "disco", "blues", "reggae", "classical", "rock",
+                 "hihop", "country", "jazz"]
 
 
 def load_data(filename: str) -> pd.DataFrame:
