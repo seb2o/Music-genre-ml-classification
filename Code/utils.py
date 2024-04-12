@@ -90,8 +90,29 @@ def plot_corr(df, topRotation=90, figNumber=None) -> None:
     :param figNumber: used to allow creating a figure before calling this function. Useful for enforcing large figures.
     """
     plt.matshow(df.corr(), fignum=figNumber)
-    plt.xticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14, rotation=topRotation)
+    plt.xticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14,
+               rotation=topRotation)
     plt.yticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14)
     cb = plt.colorbar()
     cb.ax.tick_params(labelsize=14)
     plt.title('Correlation Matrix', fontsize=16)
+
+
+def train_val_split(df: DataFrame) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
+    """
+    Splits an input df into features/target dataframes, for train and test. \n
+    Normalize the features according to the distribution of the training set.
+    :param df: should have a column "Type" and a column "GenreID" (target variable)
+    :return: X_train, y_train, X_test, y_test
+    """
+    isTrain = df['Type'] == 'Train'
+    dfTrain = df[isTrain].drop(columns='Type')
+    dfTest = df[~isTrain].drop(columns='Type')
+    X_train = dfTrain.drop(columns='GenreID')
+    y_train = dfTrain['GenreID']
+    X_test = dfTest.drop(columns='GenreID')
+    y_test = dfTest['GenreID']
+    X_train_scaled = (X_train - X_train.mean()) / X_train.std()
+    X_test_scaled = (X_test - X_train.mean()) / X_train.std()
+
+    return X_train_scaled, y_train, X_test_scaled, y_test
