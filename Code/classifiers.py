@@ -3,7 +3,8 @@ import pandas as pd
 from tensorflow.keras import layers, models, callbacks
 
 
-def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.DataFrame, y_val: pd.DataFrame) -> np.ndarray:
+def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.DataFrame,
+                    y_val: pd.DataFrame) -> np.ndarray:
     """
     Trains a fcnn using tensoflow and validate its performances. \n
     Edit the network architecture directly here.
@@ -11,7 +12,9 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
     """
     # Define your neural network architecture
     model = models.Sequential([
-        layers.Dense(64, activation='relu'),  # Adjust input_shape according to your data
+        layers.Dense(256, activation='relu'),  # Adjust input_shape according to your data
+        layers.Dense(128, activation='relu'),
+        layers.Dense(64, activation='relu'),
         layers.Dense(32, activation='relu'),
         layers.Dense(10, activation='softmax')  # Adjust num_classes according to your problem
     ])
