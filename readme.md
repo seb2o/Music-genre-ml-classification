@@ -11,5 +11,5 @@ TODO :
 
 
 ### Algorithms
+- more feature engineering : remove correlated features, add more importance to struggling classes ( rock, disco)
 - in the report.md, implement the algorithm for feature selection
-- maybe use decision tree from last semester course for task 4/ random forest library if allowed, deep learning wont be great
