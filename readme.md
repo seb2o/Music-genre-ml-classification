@@ -11,5 +11,6 @@ TODO :
 
 
 ### Algorithms
-- more feature engineering : remove correlated features, add more importance to struggling classes ( rock, disco)
+- remove correlated features, add more importance to struggling classes ( rock, disco)
+- mutual information
 - in the report.md, implement the algorithm for feature selection
