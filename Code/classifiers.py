@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 from tensorflow.keras import layers, models, callbacks
 
 
@@ -39,3 +40,16 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
     print("Validation Accuracy:", val_accuracy)
     res: np.ndarray = model.predict(X_val)
     return res.argmax(axis=1)
+
+
+def sklearn_rf(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.DataFrame, y_val: pd.DataFrame):
+    rf_classifier = RandomForestClassifier(n_estimators=1000, random_state=42, max_depth=5)
+
+    # Train the classifier
+    rf_classifier.fit(X_train, y_train)
+
+    # Make predictions
+    y_train_pred = rf_classifier.predict(X_train)
+    y_val_pred = rf_classifier.predict(X_val)
+
+    return y_val_pred
