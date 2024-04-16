@@ -31,13 +31,17 @@ def distribution(pred: Union[np.ndarray, pd.DataFrame], true: Union[np.ndarray, 
     plt.bar(utils.genreNames, np.unique(true, return_counts=True)[1], alpha=0.5, color='tab:blue')
 
 
-def multiclass_performance_metrics(y_pred: np.ndarray, y_true: np.ndarray) -> pd.DataFrame:
+def multiclass_performance_metrics(y_pred: np.ndarray, y_true: np.ndarray, labels: list[str] = None) -> pd.DataFrame:
     """
     Computes for each class as if it was binary classification the true/false positive/negative rates
+    :param labels: if Specified, replace the target classes indices by the corresponding string in the list
     :param y_pred:
     :param y_true:
     :return: a data frame with the number of each catagorie for each class, and the f1 score for each class
     """
+    if labels is None:
+        labels = list(range(10))
+
     results = pd.DataFrame(columns=["tp", "tn", "fp", "fn"])
     comp = pd.DataFrame({
         "y_pred": y_pred,
@@ -49,7 +53,7 @@ def multiclass_performance_metrics(y_pred: np.ndarray, y_true: np.ndarray) -> pd
         current_tn = comp[(comp['y_pred'] != current_class) & (comp['y_true'] != current_class)]
         current_fp = comp[(comp['y_pred'] == current_class) & (comp['y_true'] != current_class)]
         current_fn = comp[(comp['y_pred'] != current_class) & (comp['y_true'] == current_class)]
-        results.loc[current_class] = [len(current_tp), len(current_tn), len(current_fp), len(current_fn)]
+        results.loc[labels[current_class]] = [len(current_tp), len(current_tn), len(current_fp), len(current_fn)]
 
     results["F1Score"] = 2 * results.tp / (2 * results.tp + results.fn + results.fp)
 
