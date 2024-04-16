@@ -37,7 +37,7 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
                         callbacks=[early_stopping])
 
     # Evaluate the model on the validation set
-    perf = model.evaluate(X_val, y_val, return_dict=True)
+    perf = model.evaluate(X_val, y_val, return_dict=True, verbose=2)
     print(perf)
     res: np.ndarray = model.predict(X_val, verbose=0)
     return res.argmax(axis=1)
