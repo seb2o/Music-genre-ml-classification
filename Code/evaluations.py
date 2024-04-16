@@ -15,8 +15,9 @@ def conf_matrix(y_pred: Union[np.ndarray, pd.DataFrame], y_true: Union[np.ndarra
     :param y_true: the true labels
     """
     confMatrix = pd.DataFrame(confusion_matrix(y_true, y_pred), utils.genreNames, utils.genreNames)
+    cmap = sn.diverging_palette(220, 50, s=75, l=40, as_cmap=True)
     sn.set(font_scale=1.4)
-    sn.heatmap(confMatrix, annot=True, annot_kws={"size": 16}, fmt='d')
+    sn.heatmap(confMatrix, annot=True, annot_kws={"size": 16}, fmt='d', cmap=cmap)
 
 
 def distribution(pred: Union[np.ndarray, pd.DataFrame], true: Union[np.ndarray, pd.DataFrame]) -> None:

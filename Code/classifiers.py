@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from tensorflow.keras import layers, models, callbacks
+from tensorflow.keras import layers, models, callbacks, metrics, losses
 
 import utils
 
@@ -16,7 +16,7 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
     """
     # Define your neural network architecture
     model = models.Sequential([
-        layers.Dense(256, activation='relu'),  # Adjust input_shape according to your data
+        layers.Dense(256, activation='relu'),
         layers.Dense(128, activation='relu'),
         layers.Dense(64, activation='relu'),
         layers.Dense(32, activation='relu'),
@@ -25,11 +25,11 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
 
     # Compile the model
     model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
+                  loss=losses.SparseCategoricalCrossentropy(),
+                  metrics=[metrics.F1Score()])
 
     # Define callbacks (optional)
-    early_stopping = callbacks.EarlyStopping(patience=10, restore_best_weights=True)
+    early_stopping = callbacks.EarlyStopping(patience=3)
 
     # Train the model
     history = model.fit(X_train, y_train, epochs=100,
@@ -37,11 +37,9 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
                         callbacks=[early_stopping])
 
     # Evaluate the model on the validation set
-    val_loss, val_accuracy = model.evaluate(X_val, y_val)
-
-    print("Validation Loss:", val_loss)
-    print("Validation Accuracy:", val_accuracy)
-    res: np.ndarray = model.predict(X_val)
+    perf = model.evaluate(X_val, y_val, return_dict=True)
+    print(perf)
+    res: np.ndarray = model.predict(X_val, verbose=0)
     return res.argmax(axis=1)
 
 
