@@ -26,7 +26,7 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
     # Compile the model
     model.compile(optimizer='adam',
                   loss=losses.SparseCategoricalCrossentropy(),
-                  metrics=[metrics.F1Score()])
+                  metrics=[metrics.F1Score(average="macro")])
 
     # Define callbacks (optional)
     early_stopping = callbacks.EarlyStopping(patience=3)
