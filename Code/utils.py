@@ -105,10 +105,11 @@ def plot_corr(df, topRotation=90, figNumber=None) -> None:
 def train_val_split(df: DataFrame) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
     """
     Splits an input df into features/target dataframes, for train and test. \n
-    Normalize the features according to the distribution of the training set.
+    Normalize the features according to the distribution of the training set, and shuffle the dataset
     :param df: should have a column "Type" and a column "GenreID" (target variable)
     :return: X_train, y_train, X_test, y_test
     """
+    df = df.sample(frac=1)
     isTrain = df['Type'] == 'Train'
     dfTrain = df[isTrain].drop(columns='Type')
     dfTest = df[~isTrain].drop(columns='Type')
