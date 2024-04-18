@@ -64,7 +64,7 @@ def task4_df(isEDA=False) -> tuple[DataFrame, ...]:
     :param isEDA: if set to True, remove the 'Type' column.
     :return: a 3-uple with, in this order, df5s, df10s, df30s.
     """
-    featureToDrop = ['Genre', 'Track ID']
+    featureToDrop = ['Genre']
     if isEDA:
         featureToDrop = ['Type']
     return tuple(load_data(filename).drop(columns=featureToDrop) for filename in filenames)
@@ -105,18 +105,24 @@ def plot_corr(df, topRotation=90, figNumber=None) -> None:
 def train_val_split(df: DataFrame) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
     """
     Splits an input df into features/target dataframes, for train and test. \n
-    Normalize the features according to the distribution of the training set, and shuffle the dataset
+    Normalize the features according to the distribution of the training set, and shuffle the dataset \n
+    The returned y_test has a column GenreID and a column TrackID. use y_test.GenreID to get target values.
     :param df: should have a column "Type" and a column "GenreID" (target variable)
     :return: X_train, y_train, X_test, y_test
     """
     df = df.sample(frac=1)
+
     isTrain = df['Type'] == 'Train'
     dfTrain = df[isTrain].drop(columns='Type')
     dfTest = df[~isTrain].drop(columns='Type')
-    X_train = dfTrain.drop(columns='GenreID')
+
+    X_train = dfTrain.drop(columns=['GenreID', 'Track ID'])
     y_train = dfTrain['GenreID']
-    X_test = dfTest.drop(columns='GenreID')
-    y_test = dfTest['GenreID']
+
+    X_test = dfTest.drop(columns=['GenreID', 'Track ID'])
+    y_test = dfTest[['GenreID', 'Track ID']]
+    y_test = y_test.rename(columns={'Track ID': 'TrackID'})
+
     X_train_scaled = (X_train - X_train.mean()) / X_train.std()
     X_test_scaled = (X_test - X_train.mean()) / X_train.std()
 

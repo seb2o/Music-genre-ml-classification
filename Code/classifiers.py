@@ -17,9 +17,7 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
     # Define your neural network architecture
     model = models.Sequential([
         layers.Dense(256, activation='relu'),
-        layers.Dense(128, activation='relu'),
-        layers.Dense(64, activation='relu'),
-        layers.Dense(32, activation='relu'),
+        layers.Dense(256, activation='relu'),
         layers.Dense(10, activation='softmax')  # Adjust num_classes according to your problem
     ])
 
@@ -32,7 +30,7 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
     early_stopping = callbacks.EarlyStopping(patience=3)
 
     # Train the model
-    history = model.fit(X_train, y_train, epochs=100,
+    history = model.fit(X_train, y_train, epochs=300,
                         validation_data=(X_val, y_val),
                         callbacks=[early_stopping])
 
