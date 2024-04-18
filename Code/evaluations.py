@@ -7,6 +7,8 @@ import utils
 from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix
 
+from Code import classifiers
+
 
 def conf_matrix(y_pred: Union[np.ndarray, pd.DataFrame], y_true: Union[np.ndarray, pd.DataFrame]) -> None:
     """
@@ -31,7 +33,8 @@ def distribution(pred: Union[np.ndarray, pd.DataFrame], true: Union[np.ndarray, 
     plt.bar(utils.genreNames, np.unique(true, return_counts=True)[1], alpha=0.5, color='tab:blue')
 
 
-def multiclass_performance_metrics(y_pred: np.ndarray, y_true: np.ndarray, labels: list[str] = utils.genreNames) -> pd.DataFrame:
+def multiclass_performance_metrics(y_pred: np.ndarray, y_true: np.ndarray,
+                                   labels: list[str] = utils.genreNames) -> pd.DataFrame:
     """
     Computes for each class as if it was binary classification the true/false positive/negative rates
     :param labels: if Specified, replace the target classes indices by the corresponding string in the list
