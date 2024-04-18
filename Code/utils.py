@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from pandas import DataFrame
@@ -22,7 +23,7 @@ def load_data(filename: str) -> pd.DataFrame:
     :param filename: The .txt file used
     :return: dataframe of one of the dataset
     """
-    return pd.read_csv(filename, sep='\t').drop(columns=columns_to_drop)
+    return pd.read_csv(filename, sep='\t').drop(columns=columns_to_drop).rename(columns={"Track ID": "TrackID"})
 
 
 def task1_df(isEDA=False) -> pd.DataFrame:
@@ -121,3 +122,45 @@ def train_val_split(df: DataFrame) -> tuple[DataFrame, DataFrame, DataFrame, Dat
     X_test_scaled = (X_test - X_train.mean()) / X_train.std()
 
     return X_train_scaled, y_train, X_test_scaled, y_test
+
+
+def preproccess_for_lstm(df):
+    """
+    reshape, shuffles and normalize dataframe into a list of sequence of sample ( each sequence is a track)
+    :param df: preferably df5s
+    :return: x_train, y_train, x_test, y_test
+    """
+
+    isTrain = df['Type'] == 'Train'
+    dfTrain = df[isTrain].drop(columns='Type')
+    dfTest = df[~isTrain].drop(columns='Type')
+
+    columns_to_scale = dfTrain.columns.difference(['GenreID', 'TrackID'])
+
+    dfTrain_scaled = (dfTrain[columns_to_scale] - dfTrain[columns_to_scale].mean()) / dfTrain[columns_to_scale].std()
+    dfTrain_scaled["GenreID"] = dfTrain["GenreID"]
+    dfTrain_scaled["TrackID"] = dfTrain["TrackID"]
+
+    dfTest_scaled = (dfTest[columns_to_scale] - dfTrain[columns_to_scale].mean()) / dfTrain[columns_to_scale].std()
+    dfTest_scaled["GenreID"] = dfTest["GenreID"]
+    dfTest_scaled["TrackID"] = dfTest["TrackID"]
+
+    train_by_track = dfTrain_scaled \
+        .groupby('TrackID') \
+        .apply(lambda group_df:
+               (group_df.iloc[:, :-1].values, group_df.iloc[:, -1].values),
+               include_groups=False) \
+        .sample(frac=1)
+    x_train = np.stack(train_by_track.apply(lambda x: x[0]))
+    y_train = np.stack(train_by_track.apply(lambda x: x[1]))
+
+    test_by_track = dfTest_scaled \
+        .groupby('TrackID') \
+        .apply(lambda group_df:
+               (group_df.iloc[:, :-1].values, group_df.iloc[:, -1].values),
+               include_groups=False) \
+        .sample(frac=1)
+    x_test = np.stack(test_by_track.apply(lambda x: x[0]))
+    y_test = np.stack(test_by_track.apply(lambda x: x[1]))
+
+    return x_train, y_train, x_test, y_test
