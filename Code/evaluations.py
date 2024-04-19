@@ -10,7 +10,7 @@ from sklearn.metrics import confusion_matrix
 from Code import classifiers
 
 
-def conf_matrix(y_pred: Union[np.ndarray, pd.DataFrame], y_true: Union[np.ndarray, pd.DataFrame]) -> None:
+def conf_matrix(y_pred: np.ndarray, y_true: np.ndarray) -> None:
     """
     Displays the confusion matrix of the model predictions
     :param y_pred: the model predictions
