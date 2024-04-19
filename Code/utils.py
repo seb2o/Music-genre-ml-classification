@@ -9,6 +9,46 @@ EDAfeatures = ['Genre']
 givenFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo"]
 pickedFeatures = ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean", "tempo"]
 rfPickedFeatures = ["rmse_mean", "rmse_var", "spectral_contrast_var", "mfcc_4_mean"]
+mrmr_features = [
+ 'mfcc_5_std',
+ 'mfcc_4_mean',
+ 'mfcc_1_mean',
+ 'spectral_bandwidth_mean',
+ 'spectral_contrast_var',
+ 'rmse_var',
+ 'spectral_rolloff_mean',
+ 'spectral_centroid_var',
+ 'mfcc_6_mean',
+ 'spectral_centroid_mean',
+ 'mfcc_7_std',
+ 'mfcc_8_mean',
+ 'spectral_rolloff_var',
+ 'rmse_mean',
+ 'mfcc_2_mean',
+ 'mfcc_4_std',
+ 'chroma_stft_2_mean',
+ 'mfcc_6_std',
+ 'mfcc_9_mean',
+ 'chroma_stft_5_mean',
+ 'chroma_stft_7_mean',
+ 'tempo',
+ 'spectral_flatness_var',
+ 'chroma_stft_9_mean',
+ 'mfcc_3_std',
+ 'zero_cross_rate_mean',
+ 'mfcc_12_mean',
+ 'spectral_contrast_mean',
+ 'zero_cross_rate_std',
+ 'spectral_bandwidth_var',
+ 'chroma_stft_4_mean',
+ 'mfcc_7_mean',
+ 'chroma_stft_12_mean',
+ 'mfcc_3_mean',
+ 'spectral_flatness_mean',
+ 'mfcc_8_std',
+ 'chroma_stft_10_mean',
+ 'mfcc_10_mean',
+ 'mfcc_10_std']
 givenClasses = ["pop", "disco", "metal", "classical"]
 filenames = [f'{dataPath}GenreClassData_{i}s.txt' for i in [5, 10, 30]]
 columns_to_drop = ['File']
@@ -135,13 +175,13 @@ def preproccess_for_lstm(df):
     dfTrain = df[isTrain].drop(columns='Type')
     dfTest = df[~isTrain].drop(columns='Type')
 
-    columns_to_scale = dfTrain.columns.difference(['GenreID', 'TrackID'])
-
+    # columns_to_scale = dfTrain.columns.difference(['GenreID', 'TrackID'])
+    columns_to_scale = mrmr_features
     dfTrain_scaled = (dfTrain[columns_to_scale] - dfTrain[columns_to_scale].mean()) / dfTrain[columns_to_scale].std()
+    dfTest_scaled = (dfTest[columns_to_scale] - dfTrain[columns_to_scale].mean()) / dfTrain[columns_to_scale].std()
+
     dfTrain_scaled["GenreID"] = dfTrain["GenreID"]
     dfTrain_scaled["TrackID"] = dfTrain["TrackID"]
-
-    dfTest_scaled = (dfTest[columns_to_scale] - dfTrain[columns_to_scale].mean()) / dfTrain[columns_to_scale].std()
     dfTest_scaled["GenreID"] = dfTest["GenreID"]
     dfTest_scaled["TrackID"] = dfTest["TrackID"]
 
@@ -152,7 +192,8 @@ def preproccess_for_lstm(df):
                include_groups=False) \
         .sample(frac=1)
     x_train = np.stack(train_by_track.apply(lambda x: x[0]))
-    y_train = np.stack(train_by_track.apply(lambda x: x[1]))
+    y_train_redundant = np.stack(train_by_track.apply(lambda x: x[1]))
+    y_train = train_by_track.apply(lambda x: x[1][0])
 
     test_by_track = dfTest_scaled \
         .groupby('TrackID') \
@@ -161,6 +202,7 @@ def preproccess_for_lstm(df):
                include_groups=False) \
         .sample(frac=1)
     x_test = np.stack(test_by_track.apply(lambda x: x[0]))
-    y_test = np.stack(test_by_track.apply(lambda x: x[1]))
+    y_test_redundant = np.stack(test_by_track.apply(lambda x: x[1]))
+    y_test = test_by_track.apply(lambda x: x[1][0])
 
-    return x_train, y_train, x_test, y_test
+    return x_train, y_train_redundant, x_test, y_test_redundant
