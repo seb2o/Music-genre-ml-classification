@@ -165,21 +165,33 @@ def plot_corr(df, annot=True, figsize=None, abs=True, keep_diag=False) -> None:
     )
 
 
-def train_val_split(df: DataFrame) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
+def train_val_split(df: DataFrame, keep_trackID=False) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
     """
     Splits an input df into features/target dataframes, for train and test. \n
     Normalize the features according to the distribution of the training set, and shuffle the dataset
+    :param keep_trackID: if False, drop the trackID column. Else keep it in y_test
+    as an additional column
     :param df: should have a column "Type" and a column "GenreID" (target variable)
     :return: X_train, y_train, X_test, y_test
     """
+    hasTrackID = 'TrackID' in df.columns
+    features_to_drop = ['GenreID', 'TrackID'] if hasTrackID else 'GenreID'
+    y_test_features = ['GenreID', 'TrackID'] if hasTrackID and keep_trackID else 'GenreID'
+
     df = df.sample(frac=1)
     isTrain = df['Type'] == 'Train'
+
     dfTrain = df[isTrain].drop(columns='Type')
     dfTest = df[~isTrain].drop(columns='Type')
-    X_train = dfTrain.drop(columns='GenreID')
+
+
+    X_train = dfTrain.drop(columns=features_to_drop, errors='ignore')
     y_train = dfTrain['GenreID']
-    X_test = dfTest.drop(columns='GenreID')
-    y_test = dfTest['GenreID']
+
+    X_test = dfTest.drop(columns=features_to_drop, errors='ignore')
+    y_test = dfTest[y_test_features]
+
+
     X_train_scaled = (X_train - X_train.mean()) / X_train.std()
     X_test_scaled = (X_test - X_train.mean()) / X_train.std()
 
