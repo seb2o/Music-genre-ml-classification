@@ -27,12 +27,13 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
                   metrics=['accuracy'])
 
     # Define callbacks (optional)
-    early_stopping = callbacks.EarlyStopping(patience=3)
+    # early_stopping = callbacks.EarlyStopping(patience=3)
 
     # Train the model
-    history = model.fit(X_train, y_train, epochs=300,
+    history = model.fit(X_train, y_train, epochs=25,
                         validation_data=(X_val, y_val),
-                        callbacks=[early_stopping])
+                        # callbacks=[early_stopping]
+                        )
 
     # Evaluate the model on the validation set
     perf = model.evaluate(X_val, y_val, return_dict=True, verbose=2)
