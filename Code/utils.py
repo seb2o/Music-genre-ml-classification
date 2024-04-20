@@ -2,54 +2,55 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from pandas import DataFrame
+import seaborn as sn
 
 dataPath = '../Classification Music/'
 metaFeatures = ["Type", "GenreID"]
 EDAfeatures = ['Genre']
-givenFeatures = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo"]
-pickedFeatures = ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean", "tempo"]
+task1_features = ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo"]
+task3_features = ["zero_cross_rate_mean", "spectral_rolloff_mean", "mfcc_1_mean", "tempo"]
 rfPickedFeatures = ["rmse_mean", "rmse_var", "spectral_contrast_var", "mfcc_4_mean"]
 mrmr_features = [
- 'mfcc_5_std',
- 'mfcc_4_mean',
- 'mfcc_1_mean',
- 'spectral_bandwidth_mean',
- 'spectral_contrast_var',
- 'rmse_var',
- 'spectral_rolloff_mean',
- 'spectral_centroid_var',
- 'mfcc_6_mean',
- 'spectral_centroid_mean',
- 'mfcc_7_std',
- 'mfcc_8_mean',
- 'spectral_rolloff_var',
- 'rmse_mean',
- 'mfcc_2_mean',
- 'mfcc_4_std',
- 'chroma_stft_2_mean',
- 'mfcc_6_std',
- 'mfcc_9_mean',
- 'chroma_stft_5_mean',
- 'chroma_stft_7_mean',
- 'tempo',
- 'spectral_flatness_var',
- 'chroma_stft_9_mean',
- 'mfcc_3_std',
- 'zero_cross_rate_mean',
- 'mfcc_12_mean',
- 'spectral_contrast_mean',
- 'zero_cross_rate_std',
- 'spectral_bandwidth_var',
- 'chroma_stft_4_mean',
- 'mfcc_7_mean',
- 'chroma_stft_12_mean',
- 'mfcc_3_mean',
- 'spectral_flatness_mean',
- 'mfcc_8_std',
- 'chroma_stft_10_mean',
- 'mfcc_10_mean',
- 'mfcc_10_std']
-givenClasses = ["pop", "disco", "metal", "classical"]
+    'mfcc_5_std',
+    'mfcc_4_mean',
+    'mfcc_1_mean',
+    'spectral_bandwidth_mean',
+    'spectral_contrast_var',
+    'rmse_var',
+    'spectral_rolloff_mean',
+    'spectral_centroid_var',
+    'mfcc_6_mean',
+    'spectral_centroid_mean',
+    'mfcc_7_std',
+    'mfcc_8_mean',
+    'spectral_rolloff_var',
+    'rmse_mean',
+    'mfcc_2_mean',
+    'mfcc_4_std',
+    'chroma_stft_2_mean',
+    'mfcc_6_std',
+    'mfcc_9_mean',
+    'chroma_stft_5_mean',
+    'chroma_stft_7_mean',
+    'tempo',
+    'spectral_flatness_var',
+    'chroma_stft_9_mean',
+    'mfcc_3_std',
+    'zero_cross_rate_mean',
+    'mfcc_12_mean',
+    'spectral_contrast_mean',
+    'zero_cross_rate_std',
+    'spectral_bandwidth_var',
+    'chroma_stft_4_mean',
+    'mfcc_7_mean',
+    'chroma_stft_12_mean',
+    'mfcc_3_mean',
+    'spectral_flatness_mean',
+    'mfcc_8_std',
+    'chroma_stft_10_mean',
+    'mfcc_10_mean',
+    'mfcc_10_std']
+task2_classes = ["pop", "disco", "metal", "classical"]
 filenames = [f'{dataPath}GenreClassData_{i}s.txt' for i in [5, 10, 30]]
 columns_to_drop = ['File']
 genreNames = ["pop", "metal", "disco", "blues", "reggae", "classical", "rock",
@@ -73,7 +74,7 @@ def task1_df(isEDA=False) -> pd.DataFrame:
     :return: df with the above features, from the 30s dataset
     """
     additionalFeatures = EDAfeatures if isEDA else metaFeatures
-    return load_data(filenames[2])[givenFeatures + additionalFeatures]
+    return load_data(filenames[2])[task1_features + additionalFeatures]
 
 
 def task2_df() -> pd.DataFrame:
@@ -88,10 +89,10 @@ def task2_df() -> pd.DataFrame:
 
     :return: df with the above features, only for the 4 above classes, from the 30s dataset.
     """
-    return task1_df(isEDA=True).groupby('Genre').agg(list).loc[givenClasses]
+    return task1_df(isEDA=True).groupby('Genre').agg(list).loc[task2_classes]
 
 
-def task3_df(isEDA=False) -> pd.DataFrame:
+def task3_df(isEDA=False, pickedFeatures=None) -> pd.DataFrame:
     """
     Option to drop "Type" column to ease EDA.\n
     Features :\n
@@ -99,6 +100,9 @@ def task3_df(isEDA=False) -> pd.DataFrame:
     :param isEDA: if True, remove non meaningful features to ease EDA
     :return: df from the 30s dataset, with only the 4 handpicked features above
     """
+    if pickedFeatures is None:
+        pickedFeatures = task3_features
+
     additionalFeatures = EDAfeatures if isEDA else metaFeatures
     return load_data(filenames[2])[pickedFeatures + additionalFeatures]
 
@@ -131,20 +135,30 @@ def plot_feature_by_genre(feature_to_compare, use_df) -> None:
         ax_index += 1
 
 
-def plot_corr(df, topRotation=90, figNumber=None) -> None:
+def plot_corr(df, annot=True, figsize=None, abs=True) -> None:
     """
-    Plot correlation heatmap of given dataframe
+    Plot correlation heatmap of given dataframe. \n
+    :param abs: if True, plot the absolute values of the correlations
+    :param figsize: if specified, create a figure of this size
+    :param annot: if True, add correlation value on each cell
     :param df: the data frame we want to plot
-    :param topRotation: the rotation of the top legend
-    :param figNumber: used to allow creating a figure before calling this function. Useful for enforcing large figures.
     """
-    plt.matshow(df.corr(), fignum=figNumber)
-    plt.xticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14,
-               rotation=topRotation)
-    plt.yticks(range(df.select_dtypes(['number']).shape[1]), df.select_dtypes(['number']).columns, fontsize=14)
-    cb = plt.colorbar()
-    cb.ax.tick_params(labelsize=14)
-    plt.title('Correlation Matrix', fontsize=16)
+    if figsize is not None:
+        plt.figure(figsize=figsize)
+
+    corr = df.corr().abs() if abs else df.corr()
+
+
+    mask = np.triu(np.ones_like(corr))
+    np.fill_diagonal(mask, False)
+    sn.set(font_scale=1.4)
+    sn.heatmap(
+        corr,
+        annot=annot,
+        annot_kws={"size": 16},
+        linewidths=.5,
+        mask=mask,
+    )
 
 
 def train_val_split(df: DataFrame) -> tuple[DataFrame, DataFrame, DataFrame, DataFrame]:
