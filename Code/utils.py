@@ -135,9 +135,10 @@ def plot_feature_by_genre(feature_to_compare, use_df) -> None:
         ax_index += 1
 
 
-def plot_corr(df, annot=True, figsize=None, abs=True) -> None:
+def plot_corr(df, annot=True, figsize=None, abs=True, keep_diag=False) -> None:
     """
     Plot correlation heatmap of given dataframe. \n
+    :param keep_diag: if False, remove the diagonal of 1 in the correlation plot
     :param abs: if True, plot the absolute values of the correlations
     :param figsize: if specified, create a figure of this size
     :param annot: if True, add correlation value on each cell
@@ -150,7 +151,10 @@ def plot_corr(df, annot=True, figsize=None, abs=True) -> None:
 
 
     mask = np.triu(np.ones_like(corr))
-    np.fill_diagonal(mask, False)
+
+    if keep_diag:
+        np.fill_diagonal(mask, False)
+
     sn.set(font_scale=1.4)
     sn.heatmap(
         corr,
