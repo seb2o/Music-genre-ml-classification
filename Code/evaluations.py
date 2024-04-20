@@ -65,7 +65,8 @@ def evaluate_ensemble_lstm(ensemble_y_pred, y_test):
     Displays confusion matrix of the combined predictions, returns its performance along the accuracies of
     the individual models
     :param ensemble_y_pred: a dataframe with a column by model and a row by sample. The combined predictions
-    should be named "combined
+        should be named "combined"
+
     :param y_test: true label with, for each track, the same label for each sample
     :return: accuracies, performance
     """
@@ -74,7 +75,7 @@ def evaluate_ensemble_lstm(ensemble_y_pred, y_test):
 
     scores = ensemble_y_pred.apply(lambda col: np.mean(col == true))
     scores["mean"] = scores.drop(columns="combined").mean()
-    scores = scores.rename("accuracy").sort_values(ascending=False)
+    scores = scores.rename("accuracies").sort_values(ascending=False)
 
     y_pred_combined = ensemble_y_pred.combined.values
     perf = multiclass_performance_metrics(y_pred_combined, y_test_grouped)

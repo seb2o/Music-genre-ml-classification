@@ -201,7 +201,7 @@ def train_val_split(df: DataFrame, keep_trackID=False) -> tuple[DataFrame, DataF
 def preproccess_for_lstm(df, randomize_test=True):
     """
     reshape, shuffles and normalize dataframe into a list of sequence of sample ( each sequence is a track)
-    :param randomize_test:
+    :param randomize_test: If True, the test tracks order is randomized
     :param df: preferably df5s
     :return: x_train, y_train, x_test, y_test
     """

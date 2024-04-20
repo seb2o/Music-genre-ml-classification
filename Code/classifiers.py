@@ -79,6 +79,12 @@ def build_one_lstm(x_train, y_train, x_test, y_test) -> tf.keras.Sequential:
 
 
 def build_ensemble_lstm(df, nmodels=5):
+    """
+    Trains lstm models on the df and return them as a list
+    :param df: the dataset df, which *will* be pre processed
+    :param nmodels: the number of models that will be trained
+    :return: a list of the models
+    """
     models = []
     for step in range(nmodels):
         print(f"Training model {step + 1}")
@@ -89,6 +95,14 @@ def build_ensemble_lstm(df, nmodels=5):
 
 
 def predict_ensemble_lstm(x_test, models):
+    """
+    For each model on the list, make predictions on the sequence. Then the most voted label for each sequence
+    is stored in the "combined" column
+    :param x_test:
+    :param models:
+    :return:
+    """
+    tf.get_logger().setLevel('ERROR')
     all_predictions = pd.DataFrame(
         [
             [
