@@ -60,9 +60,9 @@ genreNames = ["pop", "metal", "disco", "blues", "reggae", "classical", "rock",
 def load_data(filename: str) -> pd.DataFrame:
     """
     Fetch dataset from their .txt file into a nice dataframe.
-    Normally should not be used outside this file. Prefer :func:`utils.task4_df() <utils.task4_df>`
+    Removes the column 'File'
     :param filename: The .txt file used
-    :return: dataframe of one of the dataset
+    :return: dataframe of the choosen dataset
     """
     return pd.read_csv(filename, sep='\t').drop(columns=columns_to_drop).rename(columns={"Track ID": "TrackID"})
 
