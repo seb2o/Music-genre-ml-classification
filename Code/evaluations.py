@@ -17,7 +17,6 @@ def conf_matrix(y_pred: np.ndarray, y_true: np.ndarray) -> None:
     :param y_true: the true labels
     """
     confMatrix = pd.DataFrame(confusion_matrix(y_true, y_pred), utils.genreNames, utils.genreNames)
-    cmap = sn.diverging_palette(220, 50, s=75, l=40, as_cmap=True)
     sn.set(font_scale=1.4)
     sn.heatmap(confMatrix, annot=True, annot_kws={"size": 16}, fmt='d')
 
