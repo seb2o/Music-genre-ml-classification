@@ -52,3 +52,55 @@ def sklearn_rf(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.DataFrame
              rf_classifier.feature_importances_[feature_importance_sort][-20:])
 
     return y_val_pred
+
+
+def build_one_lstm(x_train, y_train, x_test, y_test) -> tf.keras.Sequential:
+    model = tf.keras.Sequential([
+        tf.keras.layers.LSTM(128, return_sequences=True),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(10, activation='softmax'),
+    ])
+
+    model.compile(
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    model.fit(
+        x_train,
+        y_train,
+        epochs=15,
+        validation_data=(x_test, y_test),
+        verbose=0
+    )
+    return model
+
+
+def build_ensemble_lstm(df, nmodels=5):
+    models = []
+    for step in range(nmodels):
+        print(f"Training model {step + 1}")
+        x_train, y_train, x_test, y_test = utils.preproccess_for_lstm(df)
+        curr_model = build_one_lstm(x_train, y_train, x_test, y_test)
+        models.append(curr_model)
+    return models
+
+
+def predict_ensemble_lstm(x_test, models):
+    all_predictions = pd.DataFrame(
+        [
+            [
+                np.argmax(track_pred_probas[-1])
+                for track_pred_probas in model.predict(x_test, verbose=0)
+            ]
+            for model in models
+        ]
+    ).transpose()
+    all_predictions["combined"] = pd.DataFrame(
+        all_predictions
+        .apply(lambda row: row.mode()[0], axis=1))
+
+    return all_predictions
+
