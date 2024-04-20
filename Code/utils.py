@@ -198,9 +198,10 @@ def train_val_split(df: DataFrame, keep_trackID=False) -> tuple[DataFrame, DataF
     return X_train_scaled, y_train, X_test_scaled, y_test
 
 
-def preproccess_for_lstm(df):
+def preproccess_for_lstm(df, randomize_test=True):
     """
     reshape, shuffles and normalize dataframe into a list of sequence of sample ( each sequence is a track)
+    :param randomize_test:
     :param df: preferably df5s
     :return: x_train, y_train, x_test, y_test
     """
@@ -226,17 +227,17 @@ def preproccess_for_lstm(df):
                include_groups=False) \
         .sample(frac=1)
     x_train = np.stack(train_by_track.apply(lambda x: x[0]))
-    y_train_redundant = np.stack(train_by_track.apply(lambda x: x[1]))
-    y_train = train_by_track.apply(lambda x: x[1][0])
+    y_train = np.stack(train_by_track.apply(lambda x: x[1]))
 
     test_by_track = dfTest_scaled \
         .groupby('TrackID') \
         .apply(lambda group_df:
                (group_df.iloc[:, :-1].values, group_df.iloc[:, -1].values),
-               include_groups=False) \
-        .sample(frac=1)
-    x_test = np.stack(test_by_track.apply(lambda x: x[0]))
-    y_test_redundant = np.stack(test_by_track.apply(lambda x: x[1]))
-    y_test = test_by_track.apply(lambda x: x[1][0])
+               include_groups=False)
+    if randomize_test:
+        test_by_track = test_by_track.sample(frac=1)
 
-    return x_train, y_train_redundant, x_test, y_test_redundant
+    x_test = np.stack(test_by_track.apply(lambda x: x[0]))
+    y_test = np.stack(test_by_track.apply(lambda x: x[1]))
+
+    return x_train, y_train, x_test, y_test
