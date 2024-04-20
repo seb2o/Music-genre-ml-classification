@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from tensorflow.keras import layers, models, callbacks, metrics, losses
+import tensorflow as tf
 
 import utils
 
@@ -15,15 +15,15 @@ def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.Data
     :return: The predicted most probable class for each X_val sample
     """
     # Define your neural network architecture
-    model = models.Sequential([
-        layers.Dense(256, activation='relu'),
-        layers.Dense(256, activation='relu'),
-        layers.Dense(10, activation='softmax')  # Adjust num_classes according to your problem
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(10, activation='softmax')  # Adjust num_classes according to your problem
     ])
 
     # Compile the model
     model.compile(optimizer='adam',
-                  loss=losses.SparseCategoricalCrossentropy(),
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(),
                   metrics=['accuracy'])
 
     # Define callbacks (optional)
@@ -48,6 +48,7 @@ def sklearn_rf(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.DataFrame
     y_val_pred = rf_classifier.predict(X_val)
     print(f'Accuracy : {np.mean(y_val == y_val_pred)}\n')
     feature_importance_sort = rf_classifier.feature_importances_.argsort()
-    plt.barh(X_train.columns[feature_importance_sort][-20:], rf_classifier.feature_importances_[feature_importance_sort][-20:])
+    plt.barh(X_train.columns[feature_importance_sort][-20:],
+             rf_classifier.feature_importances_[feature_importance_sort][-20:])
 
     return y_val_pred
