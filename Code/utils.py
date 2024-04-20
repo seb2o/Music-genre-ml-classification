@@ -81,8 +81,12 @@ def task2_df() -> pd.DataFrame:
     Features :\n
     ["spectral_rolloff_mean", "mfcc_1_mean", "spectral_centroid_mean", "tempo", "Genre"] \n
     Classes :\n
-    ["pop", "disco", "metal", "classical"]
-    :return: df with the above features, only for the 4 above classes, from the 30s dataset
+    ["pop", "disco", "metal", "classical"]\n
+    The returned df has a row for each genre, and a column for each feature.
+    A cell contains a list of its feature's value for all samples of the dataset of genre corresponding
+    to the row.
+
+    :return: df with the above features, only for the 4 above classes, from the 30s dataset.
     """
     return task1_df(isEDA=True).groupby('Genre').agg(list).loc[givenClasses]
 
