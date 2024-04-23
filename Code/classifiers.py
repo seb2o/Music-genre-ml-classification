@@ -8,36 +8,37 @@ import utils
 
 
 def tensorflow_fcnn(X_train: pd.DataFrame, y_train: pd.DataFrame, X_val: pd.DataFrame,
-                    y_val: pd.DataFrame) -> np.ndarray:
+                    y_val: pd.DataFrame, verbose=True) -> np.ndarray:
     """
     Trains a fcnn using tensoflow and validate its performances. \n
     Edit the network architecture directly here.
     :return: The predicted most probable class for each X_val sample
     """
-    # Define your neural network architecture
+
+    if not verbose:
+        tf.get_logger().setLevel('ERROR')
+
     model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(256, activation='relu', ),
         tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dense(256, activation='relu'),
-        tf.keras.layers.Dense(10, activation='softmax')  # Adjust num_classes according to your problem
+        tf.keras.layers.Dropout(0.5),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(10, activation='softmax')
     ])
 
-    # Compile the model
     model.compile(optimizer='adam',
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(),
                   metrics=['accuracy'])
 
-    # Define callbacks (optional)
-    # early_stopping = callbacks.EarlyStopping(patience=3)
+    model.fit(X_train,
+              y_train,
+              epochs=10,
+              validation_data=(X_val, y_val),
+              verbose=2 if verbose else 0
+              )
 
-    # Train the model
-    history = model.fit(X_train, y_train, epochs=25,
-                        validation_data=(X_val, y_val),
-                        # callbacks=[early_stopping]
-                        )
-
-    # Evaluate the model on the validation set
-    perf = model.evaluate(X_val, y_val, return_dict=True, verbose=2)
-    print(perf)
     res: np.ndarray = model.predict(X_val, verbose=0)
     return res.argmax(axis=1)
 
@@ -117,4 +118,3 @@ def predict_ensemble_lstm(x_test, models):
         .apply(lambda row: row.mode()[0], axis=1))
 
     return all_predictions
-
