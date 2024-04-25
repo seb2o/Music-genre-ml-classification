@@ -1,17 +1,7 @@
-Music genre classification via machine learning
+## Music genre classification via machine learning
 
-TODO :
+  On the GTZAN dataset, we leverage an ensemble LSTM model to classify musics into the 10 dataset genres. Each sample is a set of features extracted by Librosa from a part of a music original file.
 
-### Models
-1. remove unnecessary features with [mrmr](https://github.com/smazzanti/mrmr)
-2. train on dfxs and evaluate on dfys for all x,y in {5,10,30}^2
-3. create a model with top 2 outputs instead of 1 and evaluate
-4. evaluate a Rock/non Rock binary model
-5. pipeline 3. and 4. to first oupput the two most probable classes, then discriminate using specialized model.
-
-
-### Code improvement
-- edit evaluations.tensorflow_fcnn to add network architecture as function argument 
-
-### Formatting, cleaning
-- add details to run the code for the TAs
+  - Results for tasks 1 to 3 are contained in their respective notebooks in the Code folder.
+  - Results for task 4 are in Code/task4.ipynb ; preliminary results are also presented in Code/task4_*
+  - The backbone functions for the notebooks are defined in Code/utills.py and Code/classifiers.py
