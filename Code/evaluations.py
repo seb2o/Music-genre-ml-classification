@@ -7,17 +7,19 @@ import utils
 from matplotlib import pyplot as plt
 from sklearn.metrics import confusion_matrix
 
+from Code import classifiers
 
-def conf_matrix(y_pred: Union[np.ndarray, pd.DataFrame], y_true: Union[np.ndarray, pd.DataFrame]) -> None:
+
+def conf_matrix(y_pred: np.ndarray, y_true: np.ndarray) -> None:
     """
     Displays the confusion matrix of the model predictions
     :param y_pred: the model predictions
     :param y_true: the true labels
     """
     confMatrix = pd.DataFrame(confusion_matrix(y_true, y_pred), utils.genreNames, utils.genreNames)
-    cmap = sn.diverging_palette(220, 50, s=75, l=40, as_cmap=True)
     sn.set(font_scale=1.4)
     sn.heatmap(confMatrix, annot=True, annot_kws={"size": 16}, fmt='d')
+    plt.show()
 
 
 def distribution(pred: Union[np.ndarray, pd.DataFrame], true: Union[np.ndarray, pd.DataFrame]) -> None:
@@ -31,7 +33,8 @@ def distribution(pred: Union[np.ndarray, pd.DataFrame], true: Union[np.ndarray, 
     plt.bar(utils.genreNames, np.unique(true, return_counts=True)[1], alpha=0.5, color='tab:blue')
 
 
-def multiclass_performance_metrics(y_pred: np.ndarray, y_true: np.ndarray, labels: list[str] = utils.genreNames) -> pd.DataFrame:
+def multiclass_performance_metrics(y_pred: np.ndarray, y_true: np.ndarray,
+                                   labels: list[str] = utils.genreNames) -> pd.DataFrame:
     """
     Computes for each class as if it was binary classification the true/false positive/negative rates
     :param labels: if Specified, replace the target classes indices by the corresponding string in the list
@@ -55,3 +58,26 @@ def multiclass_performance_metrics(y_pred: np.ndarray, y_true: np.ndarray, label
     results["F1Score"] = 2 * results.tp / (2 * results.tp + results.fn + results.fp)
 
     return results
+
+
+def evaluate_ensemble_lstm(ensemble_y_pred, y_test):
+    """
+    Displays confusion matrix of the combined predictions, returns its performance along the accuracies of
+    the individual models
+    :param ensemble_y_pred: a dataframe with a column by model and a row by sample. The combined predictions
+        should be named "combined"
+
+    :param y_test: true label with, for each track, the same label for each sample
+    :return: accuracies, performance
+    """
+    y_test_grouped = np.array([track_labels[0] for track_labels in y_test])
+    true = pd.Series(y_test_grouped, name="true")
+
+    scores = ensemble_y_pred.apply(lambda col: np.mean(col == true))
+    scores["mean"] = scores.drop(columns="combined").mean()
+    scores = scores.rename("accuracies").sort_values(ascending=False)
+
+    y_pred_combined = ensemble_y_pred.combined.values
+    perf = multiclass_performance_metrics(y_pred_combined, y_test_grouped)
+    conf_matrix(y_pred_combined, y_test_grouped)
+    return scores, perf
